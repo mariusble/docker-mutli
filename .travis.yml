@@ -1,0 +1,38 @@
+language: generic
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t mariusble/docker-react -f ./client/Dockerfile.dev ./client
+
+script:
+#  - docker run mariusble/docker-react npm run test -- --coverage
+  - docker run -e CI=true mariusble/docker-react npm run test
+
+after_access:
+  - docker build -t mariusble/mutli-client ./client
+  - docker build -t mariusble/mutli-nginx ./nginx
+  - docker build -t mariusble/mutli-server ./server
+  - docker build -t mariusble/mutli-worker ./worker
+
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin 
+
+  - docker push mariusble/mutli-client
+  - docker push mariusble/mutli-nginx
+  - docker push mariusble/mutli-server
+  - docker push mariusble/mutli-worker
+
+
+#deploy:
+#  provider: elasticbeanstalk
+#  region: "eu-west-3"
+#  app: "docker-react"
+#  env: "DockerReact-env"
+#  bucket_name: "elasticbeanstalk-eu-west-3-015249056795"
+#  bucker_path: "docker-react"
+#  on:
+#    branch: master 
+#  access_key_id: $AWS_ACCESS_KEY
+#  secret_access_key:
+#    secure: "$AWS_SECRET_KEY"
