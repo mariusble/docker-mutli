@@ -10,7 +10,7 @@ script:
 #  - docker run mariusble/docker-react npm run test -- --coverage
   - docker run -e CI=true mariusble/docker-react npm run test
 
-after_access:
+after_success:
   - docker build -t mariusble/mutli-client ./client
   - docker build -t mariusble/mutli-nginx ./nginx
   - docker build -t mariusble/mutli-server ./server
